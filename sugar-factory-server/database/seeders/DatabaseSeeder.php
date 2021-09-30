@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
 			"first_name" => "Nabih",
 			"last_name" => "Tannous",
 			"email" => "nabih@gmail.com",
-			"password" => hash("sha256", "test123"),
+			"password" => bcrypt("test123"),
 			"gender" => 0,
 			"interested_in" => 1,
 			"dob" => "1981-02-12",
@@ -55,7 +55,7 @@ class DatabaseSeeder extends Seeder
 			"first_name" => "Nabiha",
 			"last_name" => "Family",
 			"email" => "nabiha@gmail.com",
-			"password" => hash("sha256", "test123"),
+			"password" => bcrypt("test123"),
 			"gender" => 1,
 			"interested_in" => 0,
 			"dob" => "1981-02-12",
@@ -85,6 +85,22 @@ class DatabaseSeeder extends Seeder
 			"bio" => "Hey ! I need a sugar daddy *.* ",
 			"is_highlighted" => 1,
 	   ]);
-	   
+	   DB::table("users")->insert([
+		"user_type_id" => 1,
+		"first_name" => "admin",
+		"last_name" => "admin",
+		"email" => "admin@mail.com",
+		"password" => bcrypt("admin123"),
+		"gender" => 0,
+		"interested_in" => 1,
+		"dob" => "1981-02-12",
+		"height" => "120",
+		"weight" => "78",
+		"nationality" => "lebanese",
+		"net_worth" => "75000000",
+		"currency" => "USD",
+		"bio" => "Hello !",
+		"is_highlighted" => 0,
+   ]);
     }
 }
