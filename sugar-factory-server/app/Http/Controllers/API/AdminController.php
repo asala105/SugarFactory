@@ -47,10 +47,11 @@ class AdminController extends Controller{
 		return json_encode('declined pic');
 	}
     function approve_message($id){
-		$pic = UserMessage::where('id',$id)->update(['is_approved'=>1]);
+		$message = UserMessage::where('id',$id)->update(['is_approved'=>1]);
 		return json_encode('approved message');
 	}
     function decline_message(){
+		$message = UserPicture::where('id',$id)->delete();
 		return json_encode('declined message');
 	}
 }
