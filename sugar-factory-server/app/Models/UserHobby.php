@@ -8,6 +8,11 @@ class UserHobby extends Model{
 	protected $table = "user_hobbies";
 	
 
+	public function user(){
+		return $this->belongsTo(User::class);
+	}
+
+
 }
 
 

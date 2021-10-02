@@ -8,6 +8,13 @@ class UserMessage extends Model{
 	protected $table = "user_messages";
 	
 
+	public function user(){
+		return $this->belongsTo(User::class);
+	}
+
+
+
+
 }
 
 

@@ -8,6 +8,12 @@ class UserConnection extends Model{
 	protected $table = "user_connections";
 	
 	protected $fillable = ['user1_id','user2_id'];
+
+
+	public function user(){
+		return $this->belongsToMany(User::class);
+	}
+
 }
 
 
