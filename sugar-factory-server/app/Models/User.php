@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -45,13 +46,14 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-	
-	
-	public function getFullNameAttribute(){
-		return implode(' ', [$this->first_name, $this->last_name]);
-	}
-	
-	public function getJWTIdentifier()
+
+
+    public function getFullNameAttribute()
+    {
+        return implode(' ', [$this->first_name, $this->last_name]);
+    }
+
+    public function getJWTIdentifier()
     {
         return $this->getKey();
     }
@@ -65,6 +67,38 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
-	
-	
+
+    public function usertype(){
+        return $this->hasOne(UserType::class);
+    }
+
+    public function userconnection()
+    {
+        return $this->hasMany(UserConnection::class);
+    }
+
+    public function userfavorite()
+    {
+        return $this->hasMany(UserFavorite::class);
+    }
+    public function userhobby()
+    {
+        return $this->hasMany(UserHobby::class);
+    }
+    public function userinterest()
+    {
+        return $this->hasMany(UserInterest::class);
+    }
+    public function usermessage()
+    {
+        return $this->hasMany(UserMessage::class);
+    }
+    public function usernotification()
+    {
+        return $this->hasMany(UserNotification::class);
+    }
+    public function userpicture()
+    {
+        return $this->hasMany(UserPicture::class);
+    }
 }

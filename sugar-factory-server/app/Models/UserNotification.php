@@ -8,6 +8,14 @@ class UserNotification extends Model{
 	protected $table = "user_notifications";
 	
 	protected $fillable = ['user_id','body','is_read'];
+
+	public function user(){
+		return $this->belongsTo(User::class);
+	}
+
+
+
+
 }
 
 
