@@ -46,4 +46,6 @@ Route::group(['middleware' => 'auth.jwt'], function () {
 	Route::get('/search/{keyword}', [UserController::class, 'search'])->name('api:search');
 	Route::get('/test', [UserController::class, 'test'])->name('api:test');
 	Route::post('/logout', [AuthController::class, 'logout'])->name('api:logout');   
+
+	Route::post('/upload_picture', [AuthController::class, 'uploadPicture'])->name('api:upload_picture');
 });

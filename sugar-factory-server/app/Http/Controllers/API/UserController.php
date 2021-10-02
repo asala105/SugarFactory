@@ -7,7 +7,9 @@ use App\Models\UserFavorite;
 use App\Models\UserNotification;
 use App\Models\UserConnection;
 use App\Models\UserBlocked;
+use App\Models\UserPicture;
 use Auth;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller{
 
@@ -92,6 +94,18 @@ class UserController extends Controller{
 		return json_encode(Auth::user());
 	}
 
+	function uploadPicture(Request $request) {
+		$user = Auth::user();
+		$id = $user->id;
+		$validator = Validator::make($request->all(), [
+            'picture_url' => 'required|string|between:2,250',
+			'last_name' => 'required|string|between:2,100',
+            'email' => 'required|string|email|max:100|unique:users',
+            'password' => 'required|string|min:6',
+            'gender' => 'required',
+            'interested_in' => 'required'
+        ]);
+	}
 }
 
 ?>
