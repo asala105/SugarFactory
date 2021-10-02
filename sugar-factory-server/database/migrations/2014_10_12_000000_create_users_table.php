@@ -15,20 +15,20 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-			$table->integer('user_type_id');
+			$table->integer('user_type_id')->default(3);
             $table->string('first_name');
 			$table->string('last_name');
             $table->string('email')->unique();
 			$table->string('password');
-			$table->boolean('gender'); /* 0 for Male, 1 for Female */
-			$table->boolean('interested_in'); /* 0: interested in Men, 1: interested in Women */
-			$table->date('dob'); /* Date of birth */
-			$table->string('height');
-			$table->string('weight');
-			$table->string('nationality');
-			$table->integer('net_worth');
-			$table->string('currency');
-			$table->text('bio');
+			$table->boolean('gender')->nullable(); /* 0 for Male, 1 for Female */
+			$table->boolean('interested_in')->nullable(); /* 0: interested in Men, 1: interested in Women */
+			$table->date('dob')->nullable(); /* Date of birth */
+			$table->string('height')->nullable();
+			$table->string('weight')->nullable();
+			$table->string('nationality')->nullable();
+			$table->integer('net_worth')->nullable();
+			$table->string('currency')->nullable();
+			$table->text('bio')->nullable();
             $table->rememberToken();
             $table->timestamps();
 			$table->softDeletes();

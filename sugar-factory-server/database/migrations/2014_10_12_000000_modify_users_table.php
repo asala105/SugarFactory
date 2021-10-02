@@ -14,7 +14,7 @@ class ModifyUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-			$table->boolean('is_highlighted')->after('bio');
+			$table->boolean('is_highlighted')->after('bio')->default(0);
         });
 		
     }
