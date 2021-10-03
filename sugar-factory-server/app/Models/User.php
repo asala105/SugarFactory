@@ -25,7 +25,14 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'gender',
-        'interested_in'
+        'interested_in',
+        'dob',
+        'height',
+        'weight',
+        'nationality',
+        'net_worth',
+        'currency',
+        'bio'
     ];
 
     /**
@@ -75,6 +82,10 @@ class User extends Authenticatable implements JWTSubject
     public function userconnection()
     {
         return $this->hasMany(UserConnection::class);
+    }
+    public function userblocked()
+    {
+        return $this->hasMany(UserBlocked::class, 'from_user_id');
     }
 
     public function userfavorite()

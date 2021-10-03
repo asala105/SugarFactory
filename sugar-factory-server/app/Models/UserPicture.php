@@ -12,6 +12,12 @@ class UserPicture extends Model{
 		return $this->belongsTo(User::class);
 	}
 
+	protected $fillable = [
+        'user_id',
+        'picture_url',
+        'is_profile_picture',
+        'is_approved'
+    ];
 
 
 

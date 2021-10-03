@@ -8,8 +8,10 @@ use App\Models\UserNotification;
 use App\Models\UserConnection;
 use App\Models\UserBlocked;
 use App\Models\UserPicture;
+use Illuminate\Http\Request;
 use Auth;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;  //to validate date of birth
 
 class UserController extends Controller{
 
@@ -84,7 +86,14 @@ class UserController extends Controller{
 	}
 	
 	function highlighted(){
-		$highlighted_users = User::where("is_highlighted", 1)->limit(6)->get()->toArray();
+		$user = Auth::user();
+		$userId = $user->id;
+		$interested_in = $user->interested_in;
+		$blocked_users = $user->userblocked->pluck('to_user_id')->toArray();  // Pluck selects only the to_user_id column
+
+		$highlighted_users = User::where("is_highlighted", 1)
+									->where("gender", $interested_in)
+									->whereNotIn("id", $blocked_users)->get()->toArray();
 		return json_encode($highlighted_users);
 	}
 	
@@ -99,12 +108,131 @@ class UserController extends Controller{
 		$id = $user->id;
 		$validator = Validator::make($request->all(), [
             'picture_url' => 'required|string|between:2,250',
-			'last_name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|min:6',
-            'gender' => 'required',
-            'interested_in' => 'required'
+			'is_profile_picture' => 'required'
         ]);
+
+		if ($validator->fails()) {
+            return response()->json(array(
+                "status" => false,
+                "errors" => $validator->errors()
+            ), 400);
+        }
+
+		$user_picture = UserPicture::create(array_merge(
+            $validator->validated(),
+			['user_id' => $id,
+			'is_approved' => 0]
+		));
+
+		return response()->json([
+            'status' => true,
+            'message' => 'Picture was successfully added',
+        ], 201);
+	}
+
+	function updateProfile(Request $request) {
+		$user = Auth::user();
+		$id = $user->id;
+		$validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|between:2,100',
+			'last_name' => 'required|string|between:2,100',
+            'gender' => 'required',
+            'interested_in' => 'required',
+			'dob' => 'required|date_format:Y-m-d|before:' . Carbon::now()->subYears(18)->format('Y-m-d'),
+			'height' => 'integer',
+			'weight' => 'integer',
+			'nationality' => 'string|between:2,100',
+			'net_worth' => 'integer',
+			'currency' => 'string',
+			'bio' => 'string|max:400'
+        ]);
+
+		if ($validator->fails()) {
+            return response()->json(array(
+                "status" => false,
+                "errors" => $validator->errors()
+            ), 400);
+        }
+
+		$update_profile = User::where('id',$id)->update(
+            $validator->validated()
+		);
+
+		return response()->json([
+            'status' => true,
+            'message' => 'Profile was successfully updated',
+        ], 201);
+	}
+
+	function search(Request $request) {
+		$user = Auth::user();
+		$userId = $user->id;
+		$interest = $user->interested_in;
+		$blocked_users = $user->userblocked->pluck('to_user_id')->toArray();
+		$search_key = $request->keyword;
+		$first_name = "";
+		$last_name = "";
+		$search_array = explode(" ", $search_key);
+		//condition for if the search input was empty
+		if(count($search_array) == 0) {    
+			return;
+			//condition for if the search input was only one word
+		} elseif(count($search_array) == 1) {
+			$first_name = $search_array[0];
+			$obtained_users = User::where("first_name", 'LIKE', '%'.$first_name.'%')
+			->orWhere("last_name", 'LIKE', '%'.$first_name.'%')
+			->whereNotIn("id", $blocked_users)
+			->where("gender", $interest)
+			->where("id", "!=", $userId)->get()->toArray();
+			
+			//condition for if the search input was first name last name 
+		} else {
+			$first_name = $search_array[0];
+			$last_name = $search_array[1];
+			$obtained_users = User::where("first_name", 'LIKE', '%'.$first_name.'%')
+			->where("last_name", 'LIKE', '%'.$last_name.'%')
+			->whereNotIn("id", $blocked_users)
+			->where("id", "!=", $userId)
+			->where("gender", $interest)->get()->toArray();
+		}
+		return json_encode($obtained_users);
+	}
+
+	function getFeed() {
+		$user = Auth::user();
+		$userId = $user->id;
+		$interest = $user->interested_in;
+		$blocked_users = $user->userblocked->pluck('to_user_id')->toArray();
+		$user_feed = User::whereNotIn("id", $blocked_users)
+			->where("id", "!=", $userId)
+			->where("gender", $interest)->get()->toArray();
+		return json_encode($user_feed);
+	}
+
+	function getMessages() {
+		$user = Auth::user();
+		$userId = $user->id;
+		$messages_data = UserMessage::where("reciever_id", $userId)->where("is_approved", 1)->get()->toArray();
+		return json_encode($messages_data);
+	}
+
+	function sendMessages(Request $request) {
+		$user = Auth::user();
+		$userId = $user->id;
+		$data = $request->all();
+		$message = UserMessage::create([
+			'sender_id' => $userId,
+			'reciever_id' => $data->reciever_id,
+			'body' => $data->body,
+			'is_approved' => 0,
+			'is_read' => 0
+		]);
+
+		return response()->json([
+            'status' => true,
+            'message' => 'Message successfully sent',
+            'user' => $user
+        ], 201);
 	}
 }
 

@@ -46,6 +46,12 @@ Route::group(['middleware' => 'auth.jwt'], function () {
 	Route::get('/search/{keyword}', [UserController::class, 'search'])->name('api:search');
 	Route::get('/test', [UserController::class, 'test'])->name('api:test');
 	Route::post('/logout', [AuthController::class, 'logout'])->name('api:logout');   
-
-	Route::post('/upload_picture', [AuthController::class, 'uploadPicture'])->name('api:upload_picture');
+	
+	Route::post('/upload_picture', [UserController::class, 'uploadPicture'])->name('api:upload_picture');
+	Route::post('/update_profile', [UserController::class, 'updateProfile'])->name('api:update_profile');
+	Route::get('/home', [UserController::class, 'highlighted'])->name('api:home');
+	Route::post('/search', [UserController::class, 'search'])->name('api:search');
+	Route::get('/feed', [UserController::class, 'getFeed'])->name('api:feed');
+	Route::get('/get_messages', [UserController::class, 'getMessages'])->name('api:get_messages');
+	Route::post('/send_messages', [UserController::class, 'sendMessages'])->name('api:send_messages');
 });
