@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Auth;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;  //to validate date of birth
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller{
 
@@ -107,10 +108,10 @@ class UserController extends Controller{
 		$user = Auth::user();
 		$id = $user->id;
 		$validator = Validator::make($request->all(), [
-            'picture_url' => 'required|string|between:2,250',
+            'picture' => 'required',  
 			'is_profile_picture' => 'required'
         ]);
-
+		
 		if ($validator->fails()) {
             return response()->json(array(
                 "status" => false,
@@ -118,11 +119,24 @@ class UserController extends Controller{
             ), 400);
         }
 
-		$user_picture = UserPicture::create(array_merge(
-            $validator->validated(),
+		// $image = base64_encode($request->file('image'));    used for testing
+		
+		$image = $request->picture;  
+    	$image = str_replace('data:image/png;base64,', '', $image);
+    	$image = str_replace(' ', '+', $image);
+		$image = base64_decode($image);
+        Storage::putFile('public', $image);
+
+		// $file = $image->storeAs('users', 'public', $safeName); // stores the URL of the pic path
+
+		$user_picture = UserPicture::create(
+			// array_merge(
+            // $validator->validated(),
 			['user_id' => $id,
-			'is_approved' => 0]
-		));
+			'is_approved' => 0,
+			'picture_url' => $file,
+			'is_profile_picture' => $request->is_profile_picture]
+		);
 
 		return response()->json([
             'status' => true,
