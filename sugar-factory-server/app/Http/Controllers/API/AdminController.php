@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -10,50 +11,64 @@ use JWTAuth;
 use Auth;
 use App\Models\UserPicture;
 use App\Models\UserMessage;
-class AdminController extends Controller{
-	function view_all_users(){
+
+class AdminController extends Controller
+{
+	function view_all_users()
+	{
 		//may add filter i.e search
 		$users = User::all();
-		return json_encode($users);
+		foreach ($users as $user) {
+			$user->userpicture;
+		}
+		return json_encode(['users' => $users]);
 	}
-	function view_all_pics(){
+	function view_all_pics()
+	{
 		//may add filter i.e search
 		$users_pics = UserPicture::all();
+		foreach ($users_pics as $pic) {
+			$pic->user;
+		}
 		return json_encode($users_pics);
 	}
-	function view_all_messages(){
-		//may add filter i.e search
+	function view_all_messages()
+	{
 		$users_messages = UserMessage::all();
 		return json_encode($users_messages);
 	}
-	function remove_highlight($id){
+	function remove_highlight($id)
+	{
 		//basically we change the is_highlighted attribute to 1
-		$user = User::where('id',$id)->update(['is_highlighted'=>0]);
+		$user = User::where('id', $id)->update(['is_highlighted' => 0]);
 		return json_encode('highlight removed');
 	}
-	function highlight_user($id){
+	function highlight_user($id)
+	{
 		//basically we change the is_highlighted attribute to 1
-		$user = User::where('id',$id)->update(['is_highlighted'=>1]);
+		$user = User::where('id', $id)->update(['is_highlighted' => 1]);
 		return json_encode('highlighted');
 	}
-	function approve_pic($id){
+	function approve_pic($id)
+	{
 		//basically we change the is_approved attribute to 1
-		$pic = UserPicture::where('id',$id)->update(['is_approved'=>1]);
+		$pic = UserPicture::where('id', $id)->update(['is_approved' => 1]);
 		return json_encode('approved');
 	}
-	function decline_pic($id){
+	function decline_pic($id)
+	{
 		//here when the admin declines the pic it will be deleted and the user will be notified
-		$pic = UserPicture::where('id',$id)->delete();
+		$pic = UserPicture::where('id', $id)->delete();
 		return json_encode('declined pic');
 	}
-    function approve_message($id){
-		$message = UserMessage::where('id',$id)->update(['is_approved'=>1]);
+	function approve_message($id)
+	{
+		$message = UserMessage::where('id', $id)->update(['is_approved' => 1]);
 		return json_encode('approved message');
 	}
-    function decline_message(){
-		$message = UserPicture::where('id',$id)->delete();
+	function decline_message($id)
+	{
+		$message = UserPicture::where('id', $id)->delete();
 		return json_encode('declined message');
 	}
 }
-
-?>
