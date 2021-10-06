@@ -252,7 +252,7 @@ class UserController extends Controller
 		$interest = $user->interested_in;
 		$blocked_users = $user->userblocked->pluck('to_user_id')->toArray();
 		$user_feed = User::whereNotIn("id", $blocked_users)
-			->where("id", "!=", $userId)
+			->where("id", "!=", $userId)->where("user_type_id", "!=", 1)
 			->where("gender", $interest)->get()->toArray();
 		return json_encode($user_feed);
 	}
@@ -278,6 +278,23 @@ class UserController extends Controller
 		$userId = $user->id;
 		$notifications_data = UserNotification::where("user_id", $userId)->get()->toArray();
 		return json_encode($notifications_data);
+	}
+
+	function getFavs()
+	{
+		$favUsers = [];
+		$user = Auth::user();
+		$userId = $user->id;
+		$favs_data = UserFavorite::where("from_user_id", $userId)->get();
+		// foreach ($favs_data as $fav) {
+		// 	$userfav = User::where('id', $fav)->get();
+		// 	$favUsers[$fav] = $userfav;
+		// }
+
+		foreach ($favs_data as $fav) {
+			$fav->user;
+		}
+		return json_encode($favs_data);
 	}
 
 	function sendMessages(Request $request)
