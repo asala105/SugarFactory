@@ -1,49 +1,17 @@
 <?php
-// namespace App\Http\Controllers\API;
-
-// use App\Http\Controllers\Controller;
-// use Illuminate\Support\Facades\Input;
-// use Illuminate\Http\Request;
-
-// use App\Models\User;
-// use JWTAuth;
-// use Auth;
-
-
-// class AuthController extends Controller{
-	
-// 	function login(Request $request){
-// 		$data = $request->only("email", "password");
-
-// 		try{
-// 			if(!$token = JWTAuth::attempt($data)){
-// 				return json_encode(["error" => "Invalid Credentials"]);
-// 			}
-// 		}catch(JWTException $e){
-// 			return json_encode(["error" => "Error occured"]);
-// 		}
-		
-// 		$user = Auth::user();
-// 		$user->token = $token;
-// 		return json_encode($user);
-		
-		
-// 	}
-
-// }   <-- Old code
-
-
 
 namespace App\Http\Controllers\API;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
+use App\Models\UserConnection;
+use App\Models\UserHobby;
+use Auth;
 
 class AuthController extends Controller
 {
-
     /**
      * Get a JWT via given credentials.
      *
@@ -76,7 +44,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|between:2,100',
-			'last_name' => 'required|string|between:2,100',
+            'last_name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|min:6',
             'gender' => 'required',
@@ -92,7 +60,7 @@ class AuthController extends Controller
 
         $user = User::create(array_merge(
             $validator->validated(),
-			['password' => bcrypt($request->password)]
+            ['password' => bcrypt($request->password)]
 
         ));
 
@@ -133,7 +101,11 @@ class AuthController extends Controller
      */
     public function userProfile()
     {
-        return response()->json(auth()->user());
+        $user = Auth::user();
+        $id = $user->id;
+        $matches = UserConnection::where('user1_id', $id)->orWhere('user2_id', $id)->count();
+        $hobbies = UserHobby::where('user_id', $id)->get()->last();
+        return json_encode(['user' => $user, 'matches' => $matches, 'hobbies' => $hobbies]);
     }
 
     /**
@@ -153,5 +125,3 @@ class AuthController extends Controller
         ]);
     }
 }
-
-?>

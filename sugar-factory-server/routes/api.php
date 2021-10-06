@@ -43,11 +43,12 @@ Route::group(['middleware' => 'auth.jwt'], function () {
 	});
 
 	Route::get('/user_profile', [AuthController::class, 'userProfile'])->name('api:user_profile');
-	Route::post('/tap/{id}', [UserController::class, 'tap'])->name('api:tap');
-	Route::post('/block/{id}', [UserController::class, 'block'])->name('api:block');
+	Route::get('/tap/{id}', [UserController::class, 'tap'])->name('api:tap');
+	Route::get('/block/{id}', [UserController::class, 'block'])->name('api:block');
 	Route::get('/search/{keyword}', [UserController::class, 'search'])->name('api:search');
 	Route::get('/test', [UserController::class, 'test'])->name('api:test');
 	Route::get('/logout', [AuthController::class, 'logout'])->name('api:logout');
+	Route::get('/get_matches', [UserController::class, 'getMatches'])->name('api:getMatches');
 
 	Route::post('/upload_picture', [UserController::class, 'uploadPicture'])->name('api:upload_picture');
 	Route::post('/update_profile', [UserController::class, 'updateProfile'])->name('api:update_profile');
@@ -55,5 +56,6 @@ Route::group(['middleware' => 'auth.jwt'], function () {
 	Route::post('/search', [UserController::class, 'search'])->name('api:search');
 	Route::get('/feed', [UserController::class, 'getFeed'])->name('api:feed');
 	Route::get('/get_messages', [UserController::class, 'getMessages'])->name('api:get_messages');
+	Route::get('/get_notifications', [UserController::class, 'getNotifications'])->name('api:get_notifications');
 	Route::post('/send_messages', [UserController::class, 'sendMessages'])->name('api:send_messages');
 });

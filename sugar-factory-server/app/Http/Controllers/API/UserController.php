@@ -42,7 +42,7 @@ class UserController extends Controller
 			]);
 			$message = 'Tapped successfully';
 		}
-		//if the user tapped th other user before: 
+		//if the user tapped the other user before: 
 		else {
 			$message = 'You already tapped this user before';
 		}
@@ -87,6 +87,33 @@ class UserController extends Controller
 				'to_user_id' => $id
 			]);
 			$message = 'Blocked successfully';
+			//we need to delete any available connection between our user and the blocked user
+			$favoritesFrom = UserFavorite::where('from_user_id', $userId)->where('to_user_id', $id)->get();
+			if (!empty($favoritesFrom)) {
+				foreach ($favoritesFrom as $fav) {
+					$fav->delete();
+				}
+			}
+			$favoritesTo = UserFavorite::where('from_user_id', $userId)->where('to_user_id', $id)->get();
+			if (!empty($favoritesTo)) {
+				foreach ($favoritesTo as $fav) {
+					$fav->delete();
+				}
+			}
+			$connection1 = UserConnection::where('user1_id', $userId)->where('user2_id', $id)->get();
+			if (!empty($connection1)) {
+				foreach ($connection1 as $con) {
+					$con->delete();
+				}
+			}
+			$connection2 = UserConnection::where('user2_id', $userId)->where('user1_id', $id)->get();
+			if (!empty($connection2)) {
+				foreach ($connection2 as $con) {
+					$con->delete();
+				}
+			}
+		} else {
+			$message = 'User Already Blocked';
 		}
 	}
 
@@ -157,10 +184,6 @@ class UserController extends Controller
 		$user = Auth::user();
 		$id = $user->id;
 		$validator = Validator::make($request->all(), [
-			'first_name' => 'required|string|between:2,100',
-			'last_name' => 'required|string|between:2,100',
-			'gender' => 'required',
-			'interested_in' => 'required',
 			'dob' => 'required|date_format:Y-m-d|before:' . Carbon::now()->subYears(18)->format('Y-m-d'),
 			'height' => 'integer',
 			'weight' => 'integer',
@@ -240,6 +263,21 @@ class UserController extends Controller
 		$userId = $user->id;
 		$messages_data = UserMessage::where("reciever_id", $userId)->where("is_approved", 1)->get()->toArray();
 		return json_encode($messages_data);
+	}
+
+	function getMatches()
+	{
+		$user = Auth::user();
+		$userId = $user->id;
+		$matches_data = UserConnection::where("user1_id", $userId)->orWhere("user2_id", $userId)->get();
+		return json_encode($matches_data);
+	}
+	function getNotifications()
+	{
+		$user = Auth::user();
+		$userId = $user->id;
+		$notifications_data = UserNotification::where("user_id", $userId)->get()->toArray();
+		return json_encode($notifications_data);
 	}
 
 	function sendMessages(Request $request)
