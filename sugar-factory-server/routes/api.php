@@ -6,19 +6,7 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AdminController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
 Route::get('/highlighted', [UserController::class, 'highlighted'])->name('api:highlighted');
-//Route::post('/login', [AuthController::class, 'login'])->name('api:login');   <-- Charbel's
 Route::post('/login', [AuthController::class, 'login'])->name('api:login');                    // <--
 Route::post('/register', [AuthController::class, 'register'])->name('api:register');			  // Api routes added by Mike
 Route::post('/refresh', [AuthController::class, 'refresh'])->name('api:refresh');
@@ -38,8 +26,6 @@ Route::group(['middleware' => 'auth.jwt'], function () {
 
 		Route::delete('/decline_pic/{id}', [AdminController::class, 'decline_pic'])->name('api:decline_pic');
 		Route::delete('/decline_message/{id}', [AdminController::class, 'decline_message'])->name('api:decline_message');
-
-		//Route::post('/logout', [AuthController::class, 'logout'])->name('api:logout');
 	});
 
 	Route::get('/user_profile', [AuthController::class, 'userProfile'])->name('api:user_profile');
